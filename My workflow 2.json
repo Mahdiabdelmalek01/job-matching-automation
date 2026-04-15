@@ -1,0 +1,407 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1d13cd80-8268-44c5-afea-5f35b0c599a8",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "actorId": {
+          "__rl": true,
+          "value": "YOUR_APIFY_TOKEN",
+          "mode": "list",
+          "cachedResultName": "Linkedin Jobs Scraper (curious_coder/linkedin-jobs-scraper)",
+          "cachedResultUrl": "https://console.apify.com/actors/YOUR_APIFY_TOKEN/input"
+        },
+        "customBody": "{\n  \"urls\": [\n    \"https://www.linkedin.com/jobs/search/?keywords=Werkstudent+KI+Consulting&geoId=101282230&f_TPR=r604800&f_E=1\",\n    \"https://www.linkedin.com/jobs/search/?keywords=IT+Consulting&geoId=101282230&distance=25&f_E=1&f_TPR=r604800\",\n    \"https://www.linkedin.com/jobs/search/?keywords=AI+Automation+Engineer&geoId=101282230&distance=25&f_E=1&f_TPR=r604800\"\n  ],\n  \"scrapeCompany\": true,\n  \"count\": 20,\n  \"splitByLocation\": false\n}",
+        "timeout": 120
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "48e822a0-6dcc-41d8-a43c-548951530312",
+      "name": "Run an Actor",
+      "credentials": {
+        "apifyApi": {
+          "id": "apfy_id",
+          "name": "Apify account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.apify.com/v2/datasets/{{$json.defaultDatasetId}}/items?token=apify_api_YOUR_APIFY_TOKEN",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "1f2b4111-7325-4764-9983-b25308fd6f4b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1Erq4ilFI1Tk0uVPPVDOc86SA-hSPnanWAThvIvRD5xk/edit",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Erq4ilFI1Tk0uVPPVDOc86SA-hSPnanWAThvIvRD5xk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.date }}",
+            "Job Title": "={{ $json.title }}",
+            "Company": "={{ $json.company }}",
+            "Location": "={{ $json.location }}",
+            "Link": "={{ $json.link }}",
+            "Status": "=Neu {{ $json.status }}",
+            "Score": "={{ $json.score }}",
+            "Match Reason": "={{ $json.reason }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Job Title",
+              "displayName": "Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Match Reason",
+              "displayName": "Match Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        848,
+        0
+      ],
+      "id": "99725d7e-fab7-4203-a75b-dcac487e27bc",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google_api",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3-pro-preview",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3-pro-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a job matching assistant.\n\nCandidate profile:\n- Degree: B.Sc. Wirtschaftsinformatik + DTBS (Digital Transformation)\n- Skills: n8n, OpenAI API, Java, JavaScript, SQL, Angular, Spring Boot\n- Languages: German C1, English C1, French fluent, Arabic native\n- Target: Werkstudent in Consulting, KI, Automation, Digital Transformation, Software Engineer\n- Location: Bayern/Deutschland\n\nJob to evaluate:\nTitle: {{$json.title}}\nCompany: {{$json.companyName}}\nLocation: {{$json.location}}\nDescription: {{ $json.companyDescription }}\n\nReturn ONLY a JSON object like this:\n{\"score\": 8, \"reason\": \"Strong match because...\"}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        240
+      ],
+      "id": "694824bf-ba52-402c-a389-f781a2701d5e",
+      "name": "Message a model",
+      "retryOnFail": false,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Google_api",
+          "name": "Google Gemini API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "5c51b204-2ac6-427a-b32d-115eb690dc83",
+      "name": "Wait",
+      "webhookId": "69688801-f492-4d72-aa4b-c6c9528081bd"
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = [];\n\nfor (let i = 0; i < $input.all().length; i++) {\n  const item = $input.all()[i];\n  \n  // Get Gemini's scoring output\n  const text = item.json.content.parts[0].text;\n  const parsed = JSON.parse(text.trim());\n  \n  // Get original job data from HTTP Request node\n  const job = $('HTTP Request').all()[i].json;\n  \n  results.push({\n    json: {\n      date: job.postedAt,\n      title: job.title || job.standardizedTitle,\n      company: job.companyName,\n      location: job.location,\n      score: parsed.score,\n      reason: parsed.reason,\n      link: job.link || job.applyUrl,\n      status: \"Neu\"\n    }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        240
+      ],
+      "id": "6a2131aa-d802-47f4-ab9e-502bed057daa",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "chatId": "7009821119",
+        "text": "=🎯 New Job Match! Score: {{ $json.Score }}/10  \n📌 {{ $json['Job Title'] }} \n🏢 {{ $json.Company }} 📍 {{ $json.Location }}  \n💡 {{ $json['Match Reason'] }}  \n🔗 {{ $json.Link }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1328,
+        -16
+      ],
+      "id": "c5a92ec8-2f7e-4336-8445-8f855ac58678",
+      "name": "Send a text message",
+      "webhookId": "43b87068-8472-468a-a2a1-700b6d949fc5",
+      "credentials": {
+        "telegramApi": {
+          "id": "bot_id",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "74af2ab3-5199-488d-ab2d-f24410e67a15",
+              "leftValue": "={{ $json.Score }}",
+              "rightValue": 7,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1056,
+        0
+      ],
+      "id": "126fcec4-dc82-4447-ba21-c51400a2655f",
+      "name": "If"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Run an Actor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run an Actor": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "f346a4ee-bdd5-41f8-b39f-33c544d9ac75",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f4fffd39acd6ab4476854a38cdbc2745c18eb8bd39656fbfbb91deb59ce7ade8"
+  },
+  "id": "ID",
+  "tags": []
+}
